@@ -4,6 +4,7 @@
 
 /*
  * v0.1 2016 May 21
+ *   - add softAPConfig() to set IP address
  *   - processUdpReceive() does not have UDP echo back
  * ===== below as eps8266_151230_udpEchoWithAccessPoint =====
  * v0.2 2015 Dec. 30
@@ -24,19 +25,20 @@
 static const char *kSsid = "esp8266";
 static const char *kPassword = "12345678";
 
-ESP8266WebServer myServer(80);
+//ESP8266WebServer myServer(80);
 
 // UDP realated
 static WiFiUDP myWifiUDP;
 static char receivedBuffer[255];
 static const int kLocalPort = 7000;
 
-void handleRoot() {
-    myServer.send(200, "text/html", "<h1>You are connected</h1>");
-}
+//void handleRoot() {
+//    myServer.send(200, "text/html", "<h1>You are connected</h1>");
+//}
 
 static void WiFi_setup()
 {
+    WiFi.softAPConfig(IPAddress(192, 168, 79, 2), IPAddress(192, 168, 79, 1), IPAddress(255, 255, 255, 0));
     WiFi.softAP(kSsid, kPassword);
 
     IPAddress myIP = WiFi.softAPIP();
@@ -59,9 +61,9 @@ void setup() {
     Serial_setup();
     WiFi_setup();
 
-    myServer.on("/", handleRoot);
-    myServer.begin();
-    Serial.println("HTTP server started");
+//    myServer.on("/", handleRoot);
+//    myServer.begin();
+//    Serial.println("HTTP server started");
 }
 
 void processUdpReceive()
@@ -82,6 +84,6 @@ void processUdpReceive()
 }
 
 void loop() {
-    myServer.handleClient();
+//    myServer.handleClient();
     processUdpReceive();
 }
