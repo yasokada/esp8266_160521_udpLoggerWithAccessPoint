@@ -3,6 +3,8 @@
 #include <WiFiUDP.h>
 
 /*
+ * v0.1 2016 May 21
+ *   - processUdpReceive() does not have UDP echo back
  * ===== below as eps8266_151230_udpEchoWithAccessPoint =====
  * v0.2 2015 Dec. 30
  *   - add processUdpReceive()
@@ -76,12 +78,7 @@ void processUdpReceive()
     if (len == 0) {
         return;
     }
-    receivedBuffer[len] = 0x00;
-    
-    myWifiUDP.beginPacket( myWifiUDP.remoteIP(), myWifiUDP.remotePort() );
-    myWifiUDP.write("received:");
-    myWifiUDP.write(receivedBuffer);
-    myWifiUDP.endPacket();
+    receivedBuffer[len] = 0x00;    
 }
 
 void loop() {
