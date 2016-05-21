@@ -6,6 +6,7 @@
 
 /*
  * v0.1 2016 May 21
+ *   - add SD_write()
  *   - add SD_setup()
  *   - add softAPConfig() to set IP address
  *   - processUdpReceive() does not have UDP echo back
@@ -80,11 +81,22 @@ void setup() {
     Serial_setup();
     WiFi_setup();
     SD_setup();
-
-//    myServer.on("/", handleRoot);
-//    myServer.begin();
-//    Serial.println("HTTP server started");
 }
+
+void SD_write(char *rcvdPtr)
+{
+    s_myFile = SD.open("test.txt", FILE_WRITE);
+
+    if (s_myFile) {
+        Serial.print("Writing to test.txt...");
+        s_myFile.println(rcvdPtr);
+        s_myFile.close();
+        Serial.println("done.");
+    } else {
+        Serial.println("error opening test.txt");
+    }
+}
+
 
 void processUdpReceive()
 {
@@ -100,10 +112,10 @@ void processUdpReceive()
     if (len == 0) {
         return;
     }
-    receivedBuffer[len] = 0x00;    
+    receivedBuffer[len] = 0x00;
+    SD_write(receivedBuffer);
 }
 
 void loop() {
-//    myServer.handleClient();
     processUdpReceive();
 }
