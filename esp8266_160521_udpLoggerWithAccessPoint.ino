@@ -1,9 +1,12 @@
 #include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+//#include <ESP8266WebServer.h>
 #include <WiFiUDP.h>
+#include <SPI.h>
+#include <SD.h>
 
 /*
  * v0.1 2016 May 21
+ *   - add SD_setup()
  *   - add softAPConfig() to set IP address
  *   - processUdpReceive() does not have UDP echo back
  * ===== below as eps8266_151230_udpEchoWithAccessPoint =====
@@ -32,9 +35,25 @@ static WiFiUDP myWifiUDP;
 static char receivedBuffer[255];
 static const int kLocalPort = 7000;
 
+// SD related
+#define SD_CS (4)
+static File s_myFile;
+
 //void handleRoot() {
 //    myServer.send(200, "text/html", "<h1>You are connected</h1>");
 //}
+
+bool SD_setup()
+{
+    Serial.print("Initializing SD card...");
+
+    if (!SD.begin(SD_CS)) {
+      Serial.println("initialization failed!");
+      return false;
+    }
+    Serial.println("initialization done.");
+    return true;
+}
 
 static void WiFi_setup()
 {
@@ -60,6 +79,7 @@ void setup() {
 
     Serial_setup();
     WiFi_setup();
+    SD_setup();
 
 //    myServer.on("/", handleRoot);
 //    myServer.begin();
