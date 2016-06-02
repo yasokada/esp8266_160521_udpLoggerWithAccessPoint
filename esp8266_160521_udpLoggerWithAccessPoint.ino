@@ -4,6 +4,8 @@
 #include <SD.h>
 
 /*
+ * v0.2 2016 Jun. 2
+ *   - fix bug > SD write with extra CRLF
  * v0.1 2016 May 21
  *   - add SD_write()
  *   - add SD_setup()
@@ -82,7 +84,7 @@ void SD_write(char *rcvdPtr)
 
     if (s_myFile) {
         Serial.print("Writing to test.txt...");
-        s_myFile.println(rcvdPtr);
+        s_myFile.print(rcvdPtr);
         s_myFile.close();
         Serial.println("done.");
     } else {
