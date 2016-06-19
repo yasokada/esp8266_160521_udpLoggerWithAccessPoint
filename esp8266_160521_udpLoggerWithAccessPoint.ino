@@ -3,10 +3,13 @@
 #include <SPI.h>
 #include <SD.h>
 
+#include "esp8266_160619_timeLib.h"
+
 /*
  * v0.3 2016 Jun. 19
+ *   - add timestamp to SD logging
  *   - add time command
- *     + add procCommand()
+ *     + add processCommand()
  *     + add [kPort_command]
  *   - refactor to accomodate time command
  *     + rename processUdpReceive() to processUdpReceiveData()
@@ -115,6 +118,9 @@ void processUdpReceiveData()
     }
     
     Serial.println("received data");
+
+    TimeLib_copyDateTimeTo(receivedBuffer, sizeof(receivedBuffer) );
+    SD_write(receivedBuffer);
     
     int len = myWifiUDP_data.read(receivedBuffer, 255);
     if (len == 0) {
@@ -124,10 +130,20 @@ void processUdpReceiveData()
     SD_write(receivedBuffer);
 }
 
-void procCommand(char *cmdPtr)
+void processCommand(char *cmdPtr, int size)
 {
     if (strncmp(cmdPtr, "time", 4) == 0) {
         Serial.println("received time command");
+
+        // time[yyyymmddhhnnss]
+        TimeLib_Set_yyyymmddhhnnss( (cmdPtr + 4), size - 4 ); // 4: skip "time"
+
+        TimeLib_SerialTxDateTime();
+
+#if 0
+        TimeLib_copyDateTimeTo(receivedBuffer, sizeof(receivedBuffer) );
+        Serial.println(receivedBuffer);
+#endif        
     }
 }
 
@@ -150,7 +166,7 @@ void processUdpReceiveCommand()
 
     Serial.println(receivedBuffer);
 
-    procCommand(receivedBuffer);
+    processCommand( receivedBuffer, strlen(receivedBuffer) );
 }
 
 void loop() {
