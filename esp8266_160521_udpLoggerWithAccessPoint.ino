@@ -6,6 +6,7 @@
 /*
  * v0.3 2016 Jun. 19
  *   - add time command
+ *     + add procCommand()
  *     + add [kPort_command]
  *   - refactor to accomodate time command
  *     + rename processUdpReceive() to processUdpReceiveData()
@@ -123,6 +124,13 @@ void processUdpReceiveData()
     SD_write(receivedBuffer);
 }
 
+void procCommand(char *cmdPtr)
+{
+    if (strncmp(cmdPtr, "time", 4) == 0) {
+        Serial.println("received time command");
+    }
+}
+
 void processUdpReceiveCommand()
 {
     int rcvdSize = myWifiUDP_command.parsePacket();
@@ -133,13 +141,16 @@ void processUdpReceiveCommand()
 
     Serial.println("received command");
     
-    int len = myWifiUDP_data.read(receivedBuffer, 255);
+    int len = myWifiUDP_command.read(receivedBuffer, 255);
     if (len == 0) {
         return;
     }
+
     receivedBuffer[len] = 0x00;
 
-    // TOOD: time set
+    Serial.println(receivedBuffer);
+
+    procCommand(receivedBuffer);
 }
 
 void loop() {
